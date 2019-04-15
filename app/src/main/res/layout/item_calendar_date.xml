@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="55dp"
-    tools:background="#F8C300">
+    android:layout_width="46dp"
+    android:layout_height="56dp"
+    tools:background="#FF9B00">
 
     <RelativeLayout
         android:id="@+id/view_content"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
-        tools:background="#FCECB5">
+        tools:background="#FFE2B4">
 
         <TextView
             android:id="@+id/tv_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="16sp"
+            android:textSize="14sp"
             tools:text="1"
-            tools:textColor="#333" />
+            tools:textColor="#535563" />
 
         <TextView
             android:id="@+id/tv_state"
@@ -29,7 +29,7 @@
             android:layout_centerHorizontal="true"
             android:textSize="12sp"
             tools:text="开始"
-            tools:textColor="#333" />
+            tools:textColor="#535563" />
 
     </RelativeLayout>
 

@@ -13,11 +13,15 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class SlidingCalendarView extends LinearLayout {
     //最大区间
     public static final int MAX_RANGE = 31;
+    //最多显示月 = 当前月+下个月+之前若干个月
+    public static final int MAX_MONTH_COUNT = 14;
 
     private Context mContext;
     private boolean isShowWeek;
@@ -26,9 +30,10 @@ public class SlidingCalendarView extends LinearLayout {
     private List<DateInfoBean> mList;
     private DateAdpater mAdapter;
 
+    private DateInfoBean mStartBean;
+    private DateInfoBean mEndBean;
+
     private boolean isInAnim;
-    //今天日期
-    private DateInfoBean todayBean;
 
     public SlidingCalendarView(Context context) {
         this(context, null);
@@ -40,20 +45,21 @@ public class SlidingCalendarView extends LinearLayout {
 
     public SlidingCalendarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.mContext = context;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SlidingCalendar);
         isShowWeek = typedArray.getBoolean(R.styleable.SlidingCalendar_showWeek, false);
-        //TODO 自定义属性
 
         typedArray.recycle();
 
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
-        this.mContext = context;
+    private void init() {
         if (isShowWeek) {
             addHeadView();
         }
+        initDate();
+        addCalendarView();
     }
 
     /**
@@ -61,8 +67,7 @@ public class SlidingCalendarView extends LinearLayout {
      */
     private void addHeadView() {
         LinearLayout weekView = new LinearLayout(mContext);
-        //TODO 修改高度
-        LayoutParams headParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 100);
+        LayoutParams headParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, UIUtils.dp2px(mContext, 32));
         weekView.setLayoutParams(headParams);
         weekView.setOrientation(LinearLayout.HORIZONTAL);
         weekView.setBackgroundColor(Color.WHITE);
@@ -74,10 +79,8 @@ public class SlidingCalendarView extends LinearLayout {
             TextView tv = new TextView(mContext);
             tv.setLayoutParams(itemParams);
             tv.setGravity(Gravity.CENTER);
-            //TODO 字体颜色
             tv.setTextColor(Color.BLACK);
-            //TODO 字体大小
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, UIUtils.sp2px(mContext, 14));
             tv.setText(i);
             weekView.addView(tv);
         }
@@ -92,7 +95,6 @@ public class SlidingCalendarView extends LinearLayout {
         mDateView.setBackgroundColor(Color.WHITE);
         LayoutParams dateParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         mDateView.setLayoutParams(dateParams);
-
         GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 7);
         mDateView.setLayoutManager(gridLayoutManager);
 
@@ -137,7 +139,6 @@ public class SlidingCalendarView extends LinearLayout {
                             //非同一天,为区间结束天
                             if (checkChooseDate(firstBean, bean)) {
                                 bean.setChooseDay(true);
-                                bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_END);
                                 refreshChooseUi(firstBean, bean);
                             }
                         }
@@ -160,52 +161,132 @@ public class SlidingCalendarView extends LinearLayout {
         });
 
         addView(mDateView);
+
+        //滑动到当前月，即最后一项
+        mDateView.scrollToPosition(mList.size() - 1);
     }
 
     /**
      * 初始化日期
      */
     private void initDate() {
-        if (null == type || null == info) {
-            return
+
+        List<MonthInfoBean> monthList = new ArrayList<>();
+
+        //设置月份
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -MAX_MONTH_COUNT + 2);
+        for (int i = 0; i < MAX_MONTH_COUNT; i++) {
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH) + 1;
+            MonthInfoBean bean = new MonthInfoBean();
+            bean.setYear(year);
+            bean.setMonth(month);
+            monthList.add(bean);
+
+            calendar.add(Calendar.MONTH, 1);
         }
+        //设置日期
+        calendar = Calendar.getInstance();
+        for (MonthInfoBean bean : monthList) {
+            List<DateInfoBean> dateList = new ArrayList<>();
+            //设置当月第一天
+            calendar.set(bean.getYear(), bean.getMonth() - 1, 1);
+            int currentYear = calendar.get(Calendar.YEAR);
+            int currentMonth = calendar.get(Calendar.MONTH);
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            //第一天之前空几天
+            int firstOffset = dayOfWeek - 1;
+            //当月最后一天
+            calendar.add(Calendar.MONTH, 1);
+            calendar.add(Calendar.DATE, -1);
+            int dayOfSum = calendar.get(Calendar.DATE);
+            //设置每月的dateList
+            //每月开始空白
+            for (int i = 0; i < firstOffset; i++) {
+                DateInfoBean dateBean = new DateInfoBean();
+                dateBean.setYear(currentYear);
+                dateBean.setMonth(currentMonth + 1);
+                dateBean.setDate(0);
+                dateBean.setType(DateInfoBean.TYPE_DATE_BLANK);
+                dateBean.setGroupName(dateBean.monthToString());
+                dateList.add(dateBean);
+            }
+            //每月日期
+            for (int i = 0; i < dayOfSum; i++) {
+                DateInfoBean dateBean = new DateInfoBean();
+                dateBean.setYear(currentYear);
+                dateBean.setMonth(currentMonth + 1);
+                dateBean.setDate(i + 1);
+                dateBean.setType(DateInfoBean.TYPE_DATE_NORMAL);
+                dateBean.setGroupName(dateBean.monthToString());
+                checkRecentDay(dateBean);
+                dateList.add(dateBean);
+            }
+            //每月结束空白
+            int lastDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            int lastOffset = 7 - lastDayOfWeek;
+            for (int i = 0; i < lastOffset; i++) {
+                DateInfoBean dateBean = new DateInfoBean();
+                dateBean.setYear(currentYear);
+                dateBean.setMonth(currentMonth + 1);
+                dateBean.setDate(0);
+                dateBean.setType(DateInfoBean.TYPE_DATE_BLANK);
+                dateBean.setGroupName(dateBean.monthToString());
+                dateList.add(dateBean);
+            }
 
-        selectType = type
-        selectInfo = info
-
-        val monthList = getDateList(selectInfo)
+            bean.setDateList(dateList);
+        }
 
         //填充日期
-        dayList.clear()
-        monthList.forEachIndexed { _, monthInfo ->
-
-                val dayInfo = DayInfo(monthInfo.year, monthInfo.month, 0, DayInfo.TYPE_DAY_TITLE)
-            val monthNum = if (monthInfo.month < 10) "0${monthInfo.month}" else "${monthInfo.month}"
-            dayInfo.groupName = "${monthInfo.year}年${monthNum}月"
-            dayList.add(dayInfo)
-
-            dayList.addAll(monthInfo.dayList)
+        mList = new ArrayList<>();
+        for (MonthInfoBean bean : monthList) {
+            DateInfoBean titleBean = new DateInfoBean();
+            titleBean.setYear(bean.getYear());
+            titleBean.setMonth(bean.getMonth());
+            titleBean.setGroupName(titleBean.monthToString());
+            titleBean.setType(DateInfoBean.TYPE_DATE_TITLE);
+            mList.add(titleBean);
+            mList.addAll(bean.getDateList());
         }
+    }
 
-        //滑动到当前选择的位置
-        val curPosition = calculationCurPosition(monthList, info)
-
-        refreshData()
-
-        val mouthIndex = curPosition.first
-        val mouthRow = curPosition.second
-
-        var countRow = 0
-        for (i in 0 until mouthIndex) {
-            countRow += if (monthList[i].dayList.size % 7 == 0) monthList[i].dayList.size / 7 else monthList[i].dayList.size / 7 + 1
+    /**
+     * 判断是否今天后天明天
+     *
+     * @param bean
+     */
+    private void checkRecentDay(DateInfoBean bean) {
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+        int currentDate = calendar.get(Calendar.DATE);
+        if (bean.getYear() == currentYear && bean.getMonth() == currentMonth && bean.getDate() == currentDate) {
+            //今天
+            bean.setRecentDay(true);
+            bean.setRecentDayName(DateInfoBean.STR_RECENT_TODAY);
+            return;
         }
-
-        val headerHeight = if (mouthIndex > 0) mouthIndex * RangeDateUtils.dp2px(context, 55) else 0f
-        val countRowHeight = countRow * RangeDateUtils.dp2px(context, 55)
-        val mouthRowHeight = mouthRow * RangeDateUtils.dp2px(context, 55)
-
-        dateRecyclerView?.post {
-            dateRecyclerView?.scrollBy(0, (headerHeight + countRowHeight + mouthRowHeight).toInt())
+        calendar.add(Calendar.DATE, 1);
+        currentYear = calendar.get(Calendar.YEAR);
+        currentMonth = calendar.get(Calendar.MONTH) + 1;
+        currentDate = calendar.get(Calendar.DATE);
+        if (bean.getYear() == currentYear && bean.getMonth() == currentMonth && bean.getDate() == currentDate) {
+            //明天
+            bean.setRecentDay(true);
+            bean.setRecentDayName(DateInfoBean.STR_RECENT_TOMORROW);
+            return;
+        }
+        calendar.add(Calendar.DATE, 1);
+        currentYear = calendar.get(Calendar.YEAR);
+        currentMonth = calendar.get(Calendar.MONTH) + 1;
+        currentDate = calendar.get(Calendar.DATE);
+        if (bean.getYear() == currentYear && bean.getMonth() == currentMonth && bean.getDate() == currentDate) {
+            //后天
+            bean.setRecentDay(true);
+            bean.setRecentDayName(DateInfoBean.STR_RECENT_ACQUIRED);
+            return;
         }
     }
 
@@ -250,6 +331,7 @@ public class SlidingCalendarView extends LinearLayout {
 
     /**
      * 判断bean是否在firstBean之后且不超过最大范围
+     *
      * @param firstBean
      * @param bean
      * @return
@@ -271,6 +353,7 @@ public class SlidingCalendarView extends LinearLayout {
 
     /**
      * 判断bean是否在start-end区间
+     *
      * @param startBean
      * @param endBean
      * @param bean
@@ -280,25 +363,31 @@ public class SlidingCalendarView extends LinearLayout {
         if (null == startBean || endBean == bean || null == bean) {
             return false;
         }
-        return checkChooseDate(startBean, bean) &&  checkChooseDate(bean, endBean);
+        return checkChooseDate(startBean, bean) && checkChooseDate(bean, endBean);
     }
 
     /**
      * 选择完起始、结束后更新UI
+     *
      * @param startBean
      * @param endBean
      */
-    private void refreshChooseUi(DateInfoBean startBean, DateInfoBean endBean){
-        for (DateInfoBean bean : mList){
-            if (bean.getType() == DateInfoBean.TYPE_DATE_NORMAL && bean.isChooseDay()){
-                if (isSameDay(startBean, bean)){
-                    //第一天
-                    bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
-                }else if (isSameDay(endBean, bean)){
-                    //最后一天
-                    bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_END);
-                }else {
+    private void refreshChooseUi(DateInfoBean startBean, DateInfoBean endBean) {
+        for (DateInfoBean bean : mList) {
+            if (bean.getType() == DateInfoBean.TYPE_DATE_NORMAL) {
+                if (bean.isChooseDay()) {
+                    if (isSameDay(startBean, bean)) {
+                        //第一天
+                        bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
+                        mStartBean = startBean;
+                    } else if (isSameDay(endBean, bean)) {
+                        //最后一天
+                        bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_END);
+                        mEndBean = endBean;
+                    }
+                } else if (isInRange(startBean, endBean, bean)) {
                     //中间天
+                    bean.setChooseDay(true);
                     bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_MIDDLE);
                 }
             }
@@ -309,20 +398,40 @@ public class SlidingCalendarView extends LinearLayout {
 
     /**
      * 清除选中状态并设置起点
+     *
      * @param startDate
      */
     private void clearAndSetStartDate(DateInfoBean startDate) {
-        for (DateInfoBean bean : mList){
-            if (bean.getType() == DateInfoBean.TYPE_DATE_NORMAL &&  bean.isChooseDay()){
+        mStartBean = null;
+        mEndBean = null;
+        for (DateInfoBean bean : mList) {
+            if (bean.getType() == DateInfoBean.TYPE_DATE_NORMAL && bean.isChooseDay()) {
                 //清除旧选中区域并设置第一个选中
                 bean.setChooseDay(false);
-                if (isSameDay(startDate, bean)){
-                    bean.setChooseDay(true);
-                    bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
-                }
+            }
+            if (isSameDay(startDate, bean)) {
+                bean.setChooseDay(true);
+                bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
             }
         }
+        mAdapter.notifyDataSetChanged();
     }
 
 
+    public void onDestroy() {
+        mAdapter = null;
+    }
+
+    public void setShowWeek(boolean showWeek) {
+        isShowWeek = showWeek;
+        init();
+    }
+
+    public DateInfoBean getStartBean() {
+        return mStartBean;
+    }
+
+    public DateInfoBean getEndBean() {
+        return mEndBean;
+    }
 }

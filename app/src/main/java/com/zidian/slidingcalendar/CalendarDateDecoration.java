@@ -37,15 +37,12 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
 
         mTextPaint = new TextPaint();
         mTextPaint.setAntiAlias(true);
-        //TODO 字体大小
-        mTextPaint.setTextSize(28f);
-        //TODO 字体颜色
-        mTextPaint.setColor(Color.BLACK);
+        mTextPaint.setTextSize(UIUtils.sp2px(mContext, 14));
+        mTextPaint.setColor(mContext.getResources().getColor(R.color.colorText));
         mTextPaint.setTextAlign(Paint.Align.CENTER);
 
         mFontMetrics = mTextPaint.getFontMetrics();
-        //TODO 设置高度
-        mTop = 70;
+        mTop = UIUtils.dp2px(mContext, 32);
         mTopPadding = -((mFontMetrics.bottom - mFontMetrics.top) / 2 + mFontMetrics.top);
     }
 

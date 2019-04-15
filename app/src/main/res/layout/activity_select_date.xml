@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".SelectDateActivity">
 
-    <Button
-        android:id="@+id/btn_main_calendar"
-        android:onClick="selectDate"
+    <com.zidian.slidingcalendar.SlidingCalendarView
+        android:id="@+id/scv_main"
+        app:showWeek="false"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="日历"/>
+        android:layout_height="match_parent"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        />
 
 </LinearLayout>

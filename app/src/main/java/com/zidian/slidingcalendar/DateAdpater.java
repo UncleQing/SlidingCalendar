@@ -49,7 +49,7 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
 
         final DateInfoBean bean = mList.get(i);
 
-        switch (getItemViewType(i)) {
+        switch (bean.getType()) {
             case DateInfoBean.TYPE_DATE_BLANK:
                 //空
                 break;
@@ -60,16 +60,17 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
             case DateInfoBean.TYPE_DATE_NORMAL:
             default:
                 //日期
-                if (bean.isToday()) {
-                    viewHolder.tvDay.setText("今天");
-                } else if (bean.getDate() > 0) {
+                if (bean.isRecentDay()) {
+                    viewHolder.tvDay.setText(bean.getRecentDayName());
+                } else if (bean.getDate() <= 0) {
                     viewHolder.tvDay.setText("");
                 } else {
-                    viewHolder.tvDay.setText(bean.getDate());
+                    viewHolder.tvDay.setText(String.valueOf(bean.getDate()));
                 }
+                viewHolder.tvState.setText("");
 
                 if (bean.isChooseDay()) {
-                    //选择日期
+                    //选中日期
                     viewHolder.tvDay.setTextColor(Color.WHITE);
                     viewHolder.tvState.setTextColor(Color.WHITE);
                     switch (bean.getIntervalType()) {
@@ -94,21 +95,15 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
                     //正常日期
                     viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT);
                     viewHolder.viewDay.setBackgroundColor(Color.TRANSPARENT);
-                    if (bean.isWeekend()) {
-                        //TODO 日历颜色
-                        viewHolder.tvDay.setTextColor(Color.parseColor("#F8C300"));
-                        viewHolder.tvState.setTextColor(Color.parseColor("#F8C300"));
-                    } else {
-                        //TODO 日历颜色
-                        viewHolder.tvDay.setTextColor(Color.parseColor("#333333"));
-                        viewHolder.tvState.setTextColor(Color.parseColor("#333333"));
-                    }
+                    viewHolder.tvDay.setTextColor(Color.parseColor("#535563"));
+                    viewHolder.tvState.setTextColor(Color.parseColor("#535563"));
+
                 }
 
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (bean.isChooseDay()) {
+                        if (bean.getType() == DateInfoBean.TYPE_DATE_NORMAL) {
                             if (mListener != null) {
                                 mListener.onClickDay(v, bean, i);
                             }
@@ -122,6 +117,11 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
     @Override
     public int getItemCount() {
         return mList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mList.get(position).getType();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

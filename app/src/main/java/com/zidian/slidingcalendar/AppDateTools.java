@@ -14,11 +14,20 @@ public class AppDateTools {
 
 
     /**
-     * 获取系统时间 格式为："yyyy/MM/dd "
+     * 获取系统时间 格式为："yyyy年MM月dd日 "
      **/
     public static String getCurrentDate() {
         Date d = new Date();
         SimpleDateFormat sf = new SimpleDateFormat("yyyy年MM月dd日");
+        return sf.format(d);
+    }
+
+    /**
+     * 获取系统时间 格式为："dd"
+     **/
+    public static String getCurrentDay() {
+        Date d = new Date();
+        SimpleDateFormat sf = new SimpleDateFormat("dd");
         return sf.format(d);
     }
 
@@ -40,14 +49,7 @@ public class AppDateTools {
         return sf.format(d);
     }
 
-    /**
-     * 获取系统时间 格式为："dd"
-     **/
-    public static String getCurrentDay() {
-        Date d = new Date();
-        SimpleDateFormat sf = new SimpleDateFormat("dd");
-        return sf.format(d);
-    }
+
 
     /**
      * 获取当前时间戳
