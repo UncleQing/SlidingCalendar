@@ -1,9 +1,10 @@
-package com.zidian.slidingcalendar;
+package com.zidian.slidingcalendar.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,6 +13,9 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.zidian.slidingcalendar.R;
+import com.zidian.slidingcalendar.tools.UIUtils;
+
 public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
 
     private Context mContext;
@@ -19,6 +23,10 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
     private Paint mPaint;
     //选中框文字画笔
     private TextPaint mTextPaint;
+    //分割线
+    private Paint mDividerPaint;
+    private int mDividerHeight;
+
     private Paint.FontMetrics mFontMetrics;
     private int mTop;
     private float mTopPadding;
@@ -44,10 +52,37 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
         mFontMetrics = mTextPaint.getFontMetrics();
         mTop = UIUtils.dp2px(mContext, 32);
         mTopPadding = -((mFontMetrics.bottom - mFontMetrics.top) / 2 + mFontMetrics.top);
+
+        mDividerPaint = new Paint();
+        mDividerPaint.setColor(mContext.getResources().getColor(R.color.colorLine));
+        mDividerHeight = UIUtils.dp2px(mContext, 1);
+    }
+
+    @Override
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        super.getItemOffsets(outRect, view, parent, state);
+        outRect.left = 5;
+        outRect.right = 5;
+        outRect.bottom = mDividerHeight;
+    }
+
+    @Override
+    public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        super.onDraw(c, parent, state);
+        int childCount = parent.getChildCount();
+        int left = parent.getPaddingLeft();
+        int right = parent.getWidth() - parent.getPaddingRight();
+        for (int i = 0; i < childCount; i++) {
+            View view = parent.getChildAt(i);
+            float top = view.getBottom();
+            float bottom = view.getBottom() + mDividerHeight;
+            c.drawRect(left, top, right, bottom, mDividerPaint);
+        }
     }
 
     @Override
     public void onDrawOver(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        //悬停月份栏
         GridLayoutManager manager = (GridLayoutManager) parent.getLayoutManager();
         int position = manager.findFirstVisibleItemPosition();
         if (position == RecyclerView.NO_POSITION) {
@@ -86,14 +121,7 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
     }
 
     /**
-     * 判断是否是组中的第一个
-     */
-    private boolean isFirstInGroup(int pos) {
-        return !TextUtils.equals(mCallback.getGroupId(pos - 1), mCallback.getGroupId(pos));
-    }
-
-    /**
-     * 判断是否是组中的最后一个
+     * 判断是否是月中的最后一排
      */
     private boolean isLastInGroup(int pos) {
         return !TextUtils.equals(mCallback.getGroupId(pos), mCallback.getGroupId(pos + 7));

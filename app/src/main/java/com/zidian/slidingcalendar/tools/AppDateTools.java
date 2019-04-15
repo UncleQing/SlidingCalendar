@@ -1,4 +1,4 @@
-package com.zidian.slidingcalendar;
+package com.zidian.slidingcalendar.tools;
 
 import android.text.TextUtils;
 

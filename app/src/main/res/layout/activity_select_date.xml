@@ -6,13 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".SelectDateActivity">
 
-    <com.zidian.slidingcalendar.SlidingCalendarView
+    <com.zidian.slidingcalendar.view.SlidingCalendarView
         android:id="@+id/scv_main"
-        app:showWeek="false"
+        app:showWeek="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
         />
 
 </LinearLayout>

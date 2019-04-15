@@ -1,4 +1,4 @@
-package com.zidian.slidingcalendar;
+package com.zidian.slidingcalendar.view;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.zidian.slidingcalendar.R;
+import com.zidian.slidingcalendar.bean.DateInfoBean;
 
 import java.util.List;
 
@@ -140,7 +143,7 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
         }
     }
 
-    interface OnClickDayListener {
+    public interface OnClickDayListener {
         void onClickDay(View view, DateInfoBean bean, int position);
 
     }

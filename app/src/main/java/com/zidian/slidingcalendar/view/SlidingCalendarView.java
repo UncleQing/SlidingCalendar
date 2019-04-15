@@ -1,4 +1,4 @@
-package com.zidian.slidingcalendar;
+package com.zidian.slidingcalendar.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,6 +12,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.zidian.slidingcalendar.R;
+import com.zidian.slidingcalendar.bean.DateInfoBean;
+import com.zidian.slidingcalendar.bean.MonthInfoBean;
+import com.zidian.slidingcalendar.tools.AppDateTools;
+import com.zidian.slidingcalendar.tools.UIUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,7 +53,7 @@ public class SlidingCalendarView extends LinearLayout {
         super(context, attrs, defStyleAttr);
         this.mContext = context;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SlidingCalendar);
-        isShowWeek = typedArray.getBoolean(R.styleable.SlidingCalendar_showWeek, false);
+        isShowWeek = typedArray.getBoolean(R.styleable.SlidingCalendar_showWeek, true);
 
         typedArray.recycle();
 
@@ -66,6 +72,7 @@ public class SlidingCalendarView extends LinearLayout {
      * 添加星期
      */
     private void addHeadView() {
+        setOrientation(LinearLayout.VERTICAL);
         LinearLayout weekView = new LinearLayout(mContext);
         LayoutParams headParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, UIUtils.dp2px(mContext, 32));
         weekView.setLayoutParams(headParams);
@@ -80,7 +87,7 @@ public class SlidingCalendarView extends LinearLayout {
             tv.setLayoutParams(itemParams);
             tv.setGravity(Gravity.CENTER);
             tv.setTextColor(Color.BLACK);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, UIUtils.sp2px(mContext, 14));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             tv.setText(i);
             weekView.addView(tv);
         }

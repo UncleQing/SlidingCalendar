@@ -1,4 +1,4 @@
-package com.zidian.slidingcalendar;
+package com.zidian.slidingcalendar.bean;
 
 public class DateInfoBean {
     //view类型：空白，年月标题，日期

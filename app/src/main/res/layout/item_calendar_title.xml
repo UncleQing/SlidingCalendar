@@ -7,4 +7,5 @@
     android:gravity="center"
     android:textColor="#4F5160"
     android:textSize="14sp"
+    android:background="@color/colorTitle"
     tools:text="2018年09月" />

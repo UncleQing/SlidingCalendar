@@ -1,4 +1,4 @@
-package com.zidian.slidingcalendar;
+package com.zidian.slidingcalendar.bean;
 
 import java.util.List;
 

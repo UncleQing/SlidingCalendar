@@ -3,6 +3,8 @@ package com.zidian.slidingcalendar;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.zidian.slidingcalendar.view.SlidingCalendarView;
+
 public class SelectDateActivity extends Activity {
 
     private SlidingCalendarView scv;
