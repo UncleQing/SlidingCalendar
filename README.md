@@ -3,4 +3,4 @@
 
 具体请参照博客
 
-![](https://github.com/UncleQing/SlidingCalendarv/raw/master/raw/show.gif)
+![](https://github.com/UncleQing/SlidingCalendar/blob/master/app/src/main/res/raw/show.gif)
