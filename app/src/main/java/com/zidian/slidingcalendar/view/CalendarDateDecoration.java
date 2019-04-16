@@ -2,7 +2,6 @@ package com.zidian.slidingcalendar.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -19,9 +18,9 @@ import com.zidian.slidingcalendar.tools.UIUtils;
 public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
 
     private Context mContext;
-    //选中框画笔
+    //悬停栏背景画笔
     private Paint mPaint;
-    //选中框文字画笔
+    //悬停栏文字画笔
     private TextPaint mTextPaint;
     //分割线
     private Paint mDividerPaint;
@@ -41,7 +40,7 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
 
     private void init() {
         mPaint = new Paint();
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(mContext.getResources().getColor(R.color.colorTitle));
 
         mTextPaint = new TextPaint();
         mTextPaint.setAntiAlias(true);
@@ -61,6 +60,7 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
+        //设置padding
         outRect.left = 5;
         outRect.right = 5;
         outRect.bottom = mDividerHeight;
@@ -69,6 +69,7 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.onDraw(c, parent, state);
+        //画分割线
         int childCount = parent.getChildCount();
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();

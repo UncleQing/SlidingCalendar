@@ -10,6 +10,7 @@ import java.util.Date;
 public class AppDateTools {
 
     public static final String DATE_FORMAT ="yyyy年MM月dd日";
+    public static final String DATE_FORMAT2 ="yyyy-MM-dd";
     public static final String DATE_TIME_FORMAT ="yyyy-MM-dd HH:mm:ss";
 
 
@@ -119,7 +120,6 @@ public class AppDateTools {
         try {
             date = sdf.parse(time);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return date.getTime();

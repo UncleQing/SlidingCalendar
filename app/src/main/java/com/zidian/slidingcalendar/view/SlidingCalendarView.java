@@ -39,8 +39,6 @@ public class SlidingCalendarView extends LinearLayout {
     private DateInfoBean mStartBean;
     private DateInfoBean mEndBean;
 
-    private boolean isInAnim;
-
     public SlidingCalendarView(Context context) {
         this(context, null);
     }
@@ -108,6 +106,7 @@ public class SlidingCalendarView extends LinearLayout {
         mDateView.addItemDecoration(new CalendarDateDecoration(mContext, new CalendarDateDecoration.ChooseCallback() {
             @Override
             public String getGroupId(int position) {
+                //返回年月栏数据，如2019年1月
                 int size = mList.size();
                 if (position < size) {
                     return mList.get(position).getGroupName();
@@ -121,11 +120,10 @@ public class SlidingCalendarView extends LinearLayout {
         mAdapter.setListener(new DateAdpater.OnClickDayListener() {
             @Override
             public void onClickDay(View view, DateInfoBean bean, int position) {
-                if (isInAnim) {
-                    return;
-                }
-                int count = getSelectDayCount();
+                //点击日期的listener
 
+                //获取已选择的日期数目，0,1,2
+                int count = getSelectDayCount();
                 switch (count) {
                     case 0:
                         //尚未选择日期
@@ -145,9 +143,11 @@ public class SlidingCalendarView extends LinearLayout {
                         } else {
                             //非同一天,为区间结束天
                             if (checkChooseDate(firstBean, bean) == 1) {
+                                //第一次选择之后的一天
                                 bean.setChooseDay(true);
                                 refreshChooseUi(firstBean, bean);
                             }else if (checkChooseDate(firstBean, bean) == 0) {
+                                //第一次选择之前的一天
                                 bean.setChooseDay(true);
                                 refreshChooseUi(bean, firstBean);
                             }
@@ -166,6 +166,7 @@ public class SlidingCalendarView extends LinearLayout {
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int i) {
+                //设置每行item个数，若是title则占7个位置，若是空白或日期则占一个位置
                 return mList.get(i).getType() == DateInfoBean.TYPE_DATE_TITLE ? 7 : 1;
             }
         });
@@ -230,6 +231,7 @@ public class SlidingCalendarView extends LinearLayout {
                 dateBean.setDate(i + 1);
                 dateBean.setType(DateInfoBean.TYPE_DATE_NORMAL);
                 dateBean.setGroupName(dateBean.monthToString());
+                //设置今天明天后天
                 checkRecentDay(dateBean);
                 dateList.add(dateBean);
             }
