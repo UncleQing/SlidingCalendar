@@ -3,3 +3,4 @@
 
 具体请参照博客
 
+![](https://github.com/UncleQing/SlidingCalendarv/raw/master/raw/show.gif)
