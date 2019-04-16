@@ -144,9 +144,12 @@ public class SlidingCalendarView extends LinearLayout {
                             mAdapter.notifyItemChanged(position);
                         } else {
                             //非同一天,为区间结束天
-                            if (checkChooseDate(firstBean, bean)) {
+                            if (checkChooseDate(firstBean, bean) == 1) {
                                 bean.setChooseDay(true);
                                 refreshChooseUi(firstBean, bean);
+                            }else if (checkChooseDate(firstBean, bean) == 0) {
+                                bean.setChooseDay(true);
+                                refreshChooseUi(bean, firstBean);
                             }
                         }
                         break;
@@ -273,6 +276,9 @@ public class SlidingCalendarView extends LinearLayout {
             //今天
             bean.setRecentDay(true);
             bean.setRecentDayName(DateInfoBean.STR_RECENT_TODAY);
+            //默认选择今天
+            bean.setChooseDay(true);
+            bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
             return;
         }
         calendar.add(Calendar.DATE, 1);
@@ -343,19 +349,26 @@ public class SlidingCalendarView extends LinearLayout {
      * @param bean
      * @return
      */
-    private boolean checkChooseDate(DateInfoBean firstBean, DateInfoBean bean) {
-        if (null == firstBean || null == bean) {
-            return false;
+    /**
+     * 判断bean和firstBean日期前后
+     * -1：无效或超出最大范围或同一天
+     *  0: bean在firstBean之前
+     *  1：bean在firstBean之后
+     * @param firstBean
+     * @param bean
+     * @return
+     */
+    private int checkChooseDate(DateInfoBean firstBean, DateInfoBean bean) {
+        if (null == firstBean || null == bean || isSameDay(firstBean, bean)) {
+            return -1;
         }
-        //转为时间戳，时间戳差大于0且小于最大区间则在区间内
         long firstLongTime = AppDateTools.getStringToDate(firstBean.dateToString());
         long selectLongTime = AppDateTools.getStringToDate(bean.dateToString());
         long diffLongTime = selectLongTime - firstLongTime;
-        if (diffLongTime <= 0) {
-            return false;
-        } else {
-            return AppDateTools.diffTime2diffDay(diffLongTime) <= MAX_RANGE;
+        if (AppDateTools.diffTime2diffDay(Math.abs(diffLongTime)) > MAX_RANGE){
+            return -1;
         }
+        return selectLongTime - firstLongTime > 0 ? 1 : 0;
     }
 
     /**
@@ -370,7 +383,7 @@ public class SlidingCalendarView extends LinearLayout {
         if (null == startBean || endBean == bean || null == bean) {
             return false;
         }
-        return checkChooseDate(startBean, bean) && checkChooseDate(bean, endBean);
+        return checkChooseDate(startBean, bean) == 1 && checkChooseDate(bean, endBean) == 1;
     }
 
     /**

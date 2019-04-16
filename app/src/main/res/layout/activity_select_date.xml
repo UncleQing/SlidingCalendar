@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SelectDateActivity">
@@ -10,7 +11,15 @@
         android:id="@+id/scv_main"
         app:showWeek="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         />
+
+    <Button
+        android:layout_width="match_parent"
+        android:onClick="selectOver"
+        android:textSize="16sp"
+        android:text="完成"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
