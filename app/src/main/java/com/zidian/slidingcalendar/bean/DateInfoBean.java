@@ -20,7 +20,10 @@ public class DateInfoBean {
     private int type;
     //分组
     private String groupName;
+    //周末
     private boolean isWeekend;
+    //节日
+    private String festival;
     //最近几天
     private boolean isRecentDay;
     private String recentDayName;
@@ -109,6 +112,14 @@ public class DateInfoBean {
 
     public void setIntervalType(int intervalType) {
         this.intervalType = intervalType;
+    }
+
+    public String getFestival() {
+        return festival;
+    }
+
+    public void setFestival(String festival) {
+        this.festival = festival;
     }
 
     public String dateToString(){

@@ -70,7 +70,7 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
                 } else {
                     viewHolder.tvDay.setText(String.valueOf(bean.getDate()));
                 }
-                viewHolder.tvState.setText("");
+                viewHolder.tvState.setText(bean.getFestival());
 
                 if (bean.isChooseDay()) {
                     //选中日期
@@ -98,8 +98,12 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
                     //正常日期
                     viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT);
                     viewHolder.viewDay.setBackgroundColor(Color.TRANSPARENT);
-                    viewHolder.tvDay.setTextColor(Color.parseColor("#535563"));
-                    viewHolder.tvState.setTextColor(Color.parseColor("#535563"));
+                    if (bean.isWeekend()){
+                        viewHolder.tvDay.setTextColor(mContext.getResources().getColor(R.color.colorWeekend));
+                    }else {
+                        viewHolder.tvDay.setTextColor(mContext.getResources().getColor(R.color.colorText));
+                    }
+                    viewHolder.tvState.setTextColor(mContext.getResources().getColor(R.color.colorText));
 
                 }
 

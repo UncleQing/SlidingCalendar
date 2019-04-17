@@ -146,7 +146,7 @@ public class SlidingCalendarView extends LinearLayout {
                                 //第一次选择之后的一天
                                 bean.setChooseDay(true);
                                 refreshChooseUi(firstBean, bean);
-                            }else if (checkChooseDate(firstBean, bean) == 0) {
+                            } else if (checkChooseDate(firstBean, bean) == 0) {
                                 //第一次选择之前的一天
                                 bean.setChooseDay(true);
                                 refreshChooseUi(bean, firstBean);
@@ -233,6 +233,10 @@ public class SlidingCalendarView extends LinearLayout {
                 dateBean.setGroupName(dateBean.monthToString());
                 //设置今天明天后天
                 checkRecentDay(dateBean);
+                //设置周末
+                checkWeekend(dateBean);
+                //设置节日
+                dateBean.setFestival(checkFestival(currentMonth + 1, i + 1));
                 dateList.add(dateBean);
             }
             //每月结束空白
@@ -262,6 +266,53 @@ public class SlidingCalendarView extends LinearLayout {
             mList.add(titleBean);
             mList.addAll(bean.getDateList());
         }
+    }
+
+    /**
+     * 判断节日
+     *
+     * @param month
+     * @param date
+     * @return
+     */
+    private String checkFestival(int month, int date) {
+        if (month == 1 && date == 1) {
+            return "元旦";
+
+        } else if (month == 2 && date == 14) {
+            return "情人节";
+
+        } else if (month == 4 && date == 5) {
+            return "清明节";
+
+        } else if (month == 5 && date == 1) {
+            return "劳动节";
+
+        } else if (month == 6 && date == 1) {
+            return "儿童节";
+
+        } else if (month == 7 && date == 1) {
+            return "建党节";
+
+        } else if (month == 8 && date == 1) {
+            return "建军节";
+
+        } else if (month == 9 && date == 10) {
+            return "教师节";
+
+        } else if (month == 10 && date == 1) {
+            return "国庆";
+
+        } else if (month == 11 && date == 11) {
+            return "双11";
+
+        } else if (month == 12 && date == 24) {
+            return "平安夜";
+
+        } else if (month == 12 && date == 25) {
+            return "圣诞节";
+        }
+        return "";
     }
 
     /**
@@ -354,8 +405,9 @@ public class SlidingCalendarView extends LinearLayout {
     /**
      * 判断bean和firstBean日期前后
      * -1：无效或超出最大范围或同一天
-     *  0: bean在firstBean之前
-     *  1：bean在firstBean之后
+     * 0: bean在firstBean之前
+     * 1：bean在firstBean之后
+     *
      * @param firstBean
      * @param bean
      * @return
@@ -367,7 +419,7 @@ public class SlidingCalendarView extends LinearLayout {
         long firstLongTime = AppDateTools.getStringToDate(firstBean.dateToString());
         long selectLongTime = AppDateTools.getStringToDate(bean.dateToString());
         long diffLongTime = selectLongTime - firstLongTime;
-        if (AppDateTools.diffTime2diffDay(Math.abs(diffLongTime)) > MAX_RANGE){
+        if (AppDateTools.diffTime2diffDay(Math.abs(diffLongTime)) > MAX_RANGE) {
             return -1;
         }
         return selectLongTime - firstLongTime > 0 ? 1 : 0;
@@ -386,6 +438,27 @@ public class SlidingCalendarView extends LinearLayout {
             return false;
         }
         return checkChooseDate(startBean, bean) == 1 && checkChooseDate(bean, endBean) == 1;
+    }
+
+    /**
+     * 判断是是否是周末
+     *
+     * @param bean
+     * @return
+     */
+    private void checkWeekend(DateInfoBean bean) {
+        if (bean == null) {
+            return;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        //注意，Calendar month范围是0-11，所以要-1
+        calendar.set(bean.getYear(), bean.getMonth() - 1, bean.getDate());
+
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == 1 || dayOfWeek == 7) {
+            bean.setWeekend(true);
+        }
     }
 
     /**
