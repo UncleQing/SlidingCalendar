@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.zidian.slidingcalendar.R;
+import com.zidian.slidingcalendar.bean.DateInfoBean;
 import com.zidian.slidingcalendar.tools.UIUtils;
 
 public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
@@ -73,8 +74,18 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
         int childCount = parent.getChildCount();
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
+        DateAdpater adpater = (DateAdpater) parent.getAdapter();
         for (int i = 0; i < childCount; i++) {
             View view = parent.getChildAt(i);
+            int pos = parent.getChildAdapterPosition(view);
+            if (adpater.getItemViewType(pos) == DateInfoBean.TYPE_DATE_TITLE) {
+                //title下不画
+                continue;
+            }
+            if (isLastInGroup(pos)) {
+                //最后一行下不画
+                continue;
+            }
             float top = view.getBottom();
             float bottom = view.getBottom() + mDividerHeight;
             c.drawRect(left, top, right, bottom, mDividerPaint);
@@ -104,10 +115,15 @@ public class CalendarDateDecoration extends RecyclerView.ItemDecoration {
             }
         }
 
+//        RectF rect = new RectF(
+//                parent.getPaddingLeft(),
+//                parent.getPaddingTop(),
+//                (parent.getRight() - parent.getPaddingRight()),
+//                (parent.getPaddingTop() + mTop));
         RectF rect = new RectF(
-                parent.getPaddingLeft(),
+                0,
                 parent.getPaddingTop(),
-                (parent.getRight() - parent.getPaddingRight()),
+                (parent.getRight()),
                 (parent.getPaddingTop() + mTop));
         c.drawRect(rect, mPaint);
 

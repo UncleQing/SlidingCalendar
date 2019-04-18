@@ -163,6 +163,9 @@ public class SlidingCalendarView extends LinearLayout {
         });
 
         mDateView.setAdapter(mAdapter);
+        mDateView.setPadding(UIUtils.dp2px(mContext, 15), 0, UIUtils.dp2px(mContext, 15), 0);
+        mDateView.setClipChildren(false);
+        mDateView.setClipToPadding(false);
 
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
