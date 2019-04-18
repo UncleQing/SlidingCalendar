@@ -126,6 +126,23 @@ public class AppDateTools {
     }
 
     /**
+     * 将字符串转为时间戳
+     * @param time
+     * @param format
+     * @return
+     */
+    public static long getStringToDate(String time, String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        Date date = new Date();
+        try {
+            date = sdf.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
+    /**
      * Date转为yyyy-MM-dd
      * @param dateDate
      * @return

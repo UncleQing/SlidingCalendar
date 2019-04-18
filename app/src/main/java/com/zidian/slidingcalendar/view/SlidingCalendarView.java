@@ -38,6 +38,7 @@ public class SlidingCalendarView extends LinearLayout {
 
     private DateInfoBean mStartBean;
     private DateInfoBean mEndBean;
+    private DateInfoBean mTodayBean;
 
     public SlidingCalendarView(Context context) {
         this(context, null);
@@ -278,37 +279,26 @@ public class SlidingCalendarView extends LinearLayout {
     private String checkFestival(int month, int date) {
         if (month == 1 && date == 1) {
             return "元旦";
-
         } else if (month == 2 && date == 14) {
             return "情人节";
-
         } else if (month == 4 && date == 5) {
             return "清明节";
-
         } else if (month == 5 && date == 1) {
             return "劳动节";
-
         } else if (month == 6 && date == 1) {
             return "儿童节";
-
         } else if (month == 7 && date == 1) {
             return "建党节";
-
         } else if (month == 8 && date == 1) {
             return "建军节";
-
         } else if (month == 9 && date == 10) {
             return "教师节";
-
         } else if (month == 10 && date == 1) {
             return "国庆";
-
         } else if (month == 11 && date == 11) {
             return "双11";
-
         } else if (month == 12 && date == 24) {
             return "平安夜";
-
         } else if (month == 12 && date == 25) {
             return "圣诞节";
         }
@@ -316,7 +306,20 @@ public class SlidingCalendarView extends LinearLayout {
     }
 
     /**
-     * 判断是否今天后天明天
+     * 初始化默认选择区间:fristBean - mTodayBean
+     * @param fristBean
+     */
+    public void initDate(DateInfoBean fristBean){
+        if (fristBean == null || mTodayBean == null) {
+            return;
+        }
+        clearAndSetStartDate(fristBean);
+        mTodayBean.setChooseDay(true);
+        refreshChooseUi(fristBean, mTodayBean);
+    }
+
+    /**
+     * 设置是否今天后天明天
      *
      * @param bean
      */
@@ -327,6 +330,7 @@ public class SlidingCalendarView extends LinearLayout {
         int currentDate = calendar.get(Calendar.DATE);
         if (bean.getYear() == currentYear && bean.getMonth() == currentMonth && bean.getDate() == currentDate) {
             //今天
+            mTodayBean = bean;
             bean.setRecentDay(true);
             bean.setRecentDayName(DateInfoBean.STR_RECENT_TODAY);
             //默认选择今天
@@ -396,13 +400,6 @@ public class SlidingCalendarView extends LinearLayout {
     }
 
     /**
-     * 判断bean是否在firstBean之后且不超过最大范围
-     *
-     * @param firstBean
-     * @param bean
-     * @return
-     */
-    /**
      * 判断bean和firstBean日期前后
      * -1：无效或超出最大范围或同一天
      * 0: bean在firstBean之前
@@ -438,6 +435,21 @@ public class SlidingCalendarView extends LinearLayout {
             return false;
         }
         return checkChooseDate(startBean, bean) == 1 && checkChooseDate(bean, endBean) == 1;
+    }
+
+    /**
+     * 判断是否今天之后
+     * @param bean
+     * @return
+     */
+    private boolean checkIsAfterToday(DateInfoBean bean) {
+        if ( null == bean || null == mTodayBean) {
+            return true;
+        }
+        //转为时间戳，时间戳差转化天数判断最大范围
+        long todayLongTime = AppDateTools.getStringToDate(mTodayBean.dateToString(), AppDateTools.DATE_FORMAT2);
+        long selectLongTime = AppDateTools.getStringToDate(bean.dateToString(), AppDateTools.DATE_FORMAT2);
+        return selectLongTime - todayLongTime > 0;
     }
 
     /**
