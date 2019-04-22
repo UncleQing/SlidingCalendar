@@ -309,16 +309,20 @@ public class SlidingCalendarView extends LinearLayout {
     }
 
     /**
-     * 初始化默认选择区间:fristBean - mTodayBean
+     * 初始化默认选择区间
+     * endbean为空则以今天为结束
      * @param fristBean
+     * @param endBean
      */
-    public void initDate(DateInfoBean fristBean){
+    public void initDate(DateInfoBean fristBean, DateInfoBean endBean) {
         if (fristBean == null || mTodayBean == null) {
             return;
         }
-        clearAndSetStartDate(fristBean);
-        mTodayBean.setChooseDay(true);
-        refreshChooseUi(fristBean, mTodayBean);
+        if (endBean == null){
+            refreshChooseUi(fristBean, mTodayBean);
+        }else {
+            refreshChooseUi(fristBean, endBean);
+        }
     }
 
     /**
@@ -516,10 +520,11 @@ public class SlidingCalendarView extends LinearLayout {
         mEndBean = null;
         for (DateInfoBean bean : mList) {
             if (bean.getType() == DateInfoBean.TYPE_DATE_NORMAL && bean.isChooseDay()) {
-                //清除旧选中区域并设置第一个选中
+                //清除旧选中区域
                 bean.setChooseDay(false);
             }
             if (isSameDay(startDate, bean)) {
+                //设置第一个选中
                 bean.setChooseDay(true);
                 bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
             }
