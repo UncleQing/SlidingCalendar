@@ -31,6 +31,7 @@ public class SlidingCalendarView extends LinearLayout {
 
     private Context mContext;
     private boolean isShowWeek;
+    private GridLayoutManager mLayoutManager;
     private RecyclerView mDateView;
 
     private List<DateInfoBean> mList;
@@ -39,6 +40,8 @@ public class SlidingCalendarView extends LinearLayout {
     private DateInfoBean mStartBean;
     private DateInfoBean mEndBean;
     private DateInfoBean mTodayBean;
+
+    private int mStartPos;
 
     public SlidingCalendarView(Context context) {
         this(context, null);
@@ -101,8 +104,8 @@ public class SlidingCalendarView extends LinearLayout {
         mDateView.setBackgroundColor(Color.WHITE);
         LayoutParams dateParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         mDateView.setLayoutParams(dateParams);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 7);
-        mDateView.setLayoutManager(gridLayoutManager);
+        mLayoutManager = new GridLayoutManager(mContext, 7);
+        mDateView.setLayoutManager(mLayoutManager);
 
         mDateView.addItemDecoration(new CalendarDateDecoration(mContext, new CalendarDateDecoration.ChooseCallback() {
             @Override
@@ -167,7 +170,7 @@ public class SlidingCalendarView extends LinearLayout {
         mDateView.setClipChildren(false);
         mDateView.setClipToPadding(false);
 
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int i) {
                 //设置每行item个数，若是title则占7个位置，若是空白或日期则占一个位置
@@ -494,6 +497,7 @@ public class SlidingCalendarView extends LinearLayout {
                         //第一天
                         bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
                         mStartBean = startBean;
+                        mStartPos = mList.indexOf(bean);
                     } else if (isSameDay(endBean, bean)) {
                         //最后一天
                         bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_END);
@@ -507,6 +511,7 @@ public class SlidingCalendarView extends LinearLayout {
             }
         }
         mAdapter.notifyDataSetChanged();
+        mLayoutManager.scrollToPositionWithOffset(mStartPos, UIUtils.dp2px(mContext, 32));
     }
 
 
