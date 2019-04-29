@@ -110,6 +110,9 @@ public class SlidingCalendarView extends LinearLayout {
         mDateView.addItemDecoration(new CalendarDateDecoration(mContext, new CalendarDateDecoration.ChooseCallback() {
             @Override
             public String getGroupId(int position) {
+                if (position == -1){
+                    return "";
+                }
                 //返回年月栏数据，如2019年1月
                 int size = mList.size();
                 if (position < size) {
@@ -131,17 +134,14 @@ public class SlidingCalendarView extends LinearLayout {
                 switch (count) {
                     case 0:
                         //尚未选择日期
-                        bean.setChooseDay(true);
-                        bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
-
-                        //刷新当前View
-                        mAdapter.notifyItemChanged(position);
+                        clearAndSetStartDate(bean);
                         break;
                     case 1:
                         //已选择一天
                         DateInfoBean firstBean = getFirstSelectDay();
                         if (isSameDay(firstBean, bean)) {
                             //同一天则取消选择
+                            mStartBean = null;
                             firstBean.setChooseDay(false);
                             mAdapter.notifyItemChanged(position);
                         } else {
@@ -530,6 +530,7 @@ public class SlidingCalendarView extends LinearLayout {
             }
             if (isSameDay(startDate, bean)) {
                 //设置第一个选中
+                mStartBean = bean;
                 bean.setChooseDay(true);
                 bean.setIntervalType(DateInfoBean.TYPE_INTERVAL_START);
             }

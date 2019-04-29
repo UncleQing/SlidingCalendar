@@ -128,7 +128,7 @@ public class DateAdpater extends RecyclerView.Adapter<DateAdpater.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        return mList.get(position).getType();
+        return position != -1 ? mList.get(position).getType() : -1;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

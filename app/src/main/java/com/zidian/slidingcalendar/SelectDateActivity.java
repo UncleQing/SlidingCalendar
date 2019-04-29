@@ -32,8 +32,11 @@ public class SelectDateActivity extends Activity {
         //完成button
         DateInfoBean startBean = scv.getStartBean();
         DateInfoBean endBean = scv.getEndBean();
-        if (startBean == null || endBean == null) {
+        if (startBean == null) {
             return;
+        }
+        if (endBean == null){
+            endBean = startBean;
         }
 
         Intent intent = getIntent();
